@@ -1,0 +1,66 @@
+[
+  {
+    "domain": ".bbs.byr.cn",
+    "httponly": false,
+    "name": "Hm_lpvt_38b0e830a659ea9a05888b924f641842",
+    "path": "/",
+    "secure": false,
+    "value": "1500630278"
+  },
+  {
+    "domain": ".bbs.byr.cn",
+    "expires": "周六, 21 7月 2018 09:44:37 GMT",
+    "expiry": 1532166277,
+    "httponly": false,
+    "name": "Hm_lvt_38b0e830a659ea9a05888b924f641842",
+    "path": "/",
+    "secure": false,
+    "value": "1500629775,1500629862,1500630032,1500630063"
+  },
+  {
+    "domain": ".bbs.byr.cn",
+    "httponly": false,
+    "name": "nforum[UTMPNUM]",
+    "path": "/",
+    "secure": false,
+    "value": "4860"
+  },
+  {
+    "domain": ".bbs.byr.cn",
+    "httponly": false,
+    "name": "nforum[UTMPKEY]",
+    "path": "/",
+    "secure": false,
+    "value": "67332461"
+  },
+  {
+    "domain": ".bbs.byr.cn",
+    "expires": "周日, 20 8月 2017 09:41:04 GMT",
+    "expiry": 1503193264,
+    "httponly": false,
+    "name": "login-user",
+    "path": "/",
+    "secure": false,
+    "value": "linshao"
+  },
+  {
+    "domain": ".bbs.byr.cn",
+    "expires": "周日, 20 8月 2017 09:41:04 GMT",
+    "expiry": 1503193264,
+    "httponly": false,
+    "name": "nforum[UTMPUSERID]",
+    "path": "/",
+    "secure": false,
+    "value": "linshao"
+  },
+  {
+    "domain": ".bbs.byr.cn",
+    "expires": "周日, 20 8月 2017 09:41:04 GMT",
+    "expiry": 1503193264,
+    "httponly": false,
+    "name": "nforum[PASSWORD]",
+    "path": "/",
+    "secure": false,
+    "value": "dnAOGndWHKv8kbwLCzAykA%3D%3D"
+  }
+]
