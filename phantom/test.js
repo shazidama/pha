@@ -1,20 +1,14 @@
 const phantom = require('phantom');
 const $ = require('jquery')
 const cookies = require('./cookie/byrLinshao.json')
-var fs = require('fs')
+const JsonOutput = require('./cookie/cookieEdit')
+
 
 let info = {
     url : 'https://bbs.byr.cn/#default',
     cookies : cookies
 }
 
-let JsonOutput = ( data, outUrl )=>{
-    let string = JSON.stringify(data,null,2)
-    fs.writeFile(__dirname+outUrl, string , function (err) {
-        if (err) throw err;
-        console.log('It\'s saved!');
-    });
-}
 let urls = []
 
 async  function pha() {
@@ -30,6 +24,9 @@ async  function pha() {
             page.addCookie(cookie)
         }
     )
+    await page.on('onUrlChanged',(targetUrl)=>{
+        urls.push(targetUrl)
+    })
 
     const status = await page.open(info.url).then(
         (status)=>{
@@ -38,14 +35,10 @@ async  function pha() {
         }
     )
 
-    await page.on('onUrlChanged',(targetUrl)=>{
-        urls.push(targetUrl)
-    })
-
     await page.evaluate(function() {
-        $("#u_login_id").val('linshao')
-        $("#u_login_passwd").val('11qq22ww33')
-        $("#u_login_submit").click()
+        // $("#u_login_id").val('linshao')
+        // $("#u_login_passwd").val('11qq22ww33')
+        // $("#u_login_submit").click()
     })
     .then(
         page.render('gwp.png')
@@ -58,7 +51,7 @@ async  function pha() {
     console.log(content)
 
     let cookies = await page.property('cookies')
-     JsonOutput( cookies, '/cookie/byrLinshao.json' )
+     JsonOutput( cookies, 'byrLinshao.json' )
 
     await instance.exit();
 }
