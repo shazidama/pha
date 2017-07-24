@@ -6,7 +6,8 @@ const JsonOutput = require('./cookie/cookieEdit')
 
 let info = {
     url : 'https://bbs.byr.cn/#default',
-    cookies : cookies
+    cookies : cookies,
+    draw: false
 }
 
 let urls = []
@@ -19,6 +20,8 @@ async  function pha() {
     /*this initial setting
     */
     await page.property('viewportSize', {width: 1920, height: 1080});
+    console.log(typeof info.cookies)
+
     await info.cookies.map(
         (cookie)=>{
             page.addCookie(cookie)
@@ -35,6 +38,7 @@ async  function pha() {
         }
     )
 
+
     await page.evaluate(function() {
         // $("#u_login_id").val('linshao')
         // $("#u_login_passwd").val('11qq22ww33')
@@ -43,9 +47,7 @@ async  function pha() {
     .then(
         page.render('gwp.png')
     );
-    await page.evaluate(function() {
-        $("#u_login_submit").click()
-     })
+    await page.evaluate( function(){ $("#u_login_submit").click() } )
 
     const content = await page.property('content');
     console.log(content)
