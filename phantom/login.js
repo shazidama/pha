@@ -3,7 +3,7 @@ const $ = require('jquery')
 const cookies = require('./cookie/byrLinshao.json')
 const JsonOutput = require('./cookie/cookieEdit')
 
-
+//info.url可以作为前端交互部分
 let info = {
     url : 'https://bbs.byr.cn/#default',
     cookies : cookies,
@@ -20,7 +20,6 @@ async  function pha() {
     /*this initial setting
     */
     await page.property('viewportSize', {width: 1920, height: 1080});
-    console.log(typeof info.cookies)
 
     await info.cookies.map(
         (cookie)=>{
@@ -38,19 +37,19 @@ async  function pha() {
         }
     )
 
-
+    //此处可以作为交互部分
     await page.evaluate(function() {
-        // $("#u_login_id").val('linshao')
-        // $("#u_login_passwd").val('11qq22ww33')
-        // $("#u_login_submit").click()
+        $("#u_login_id").val('linshao')
+        $("#u_login_passwd").val('11qq22ww33')
+        $("#u_login_submit").click()
     })
     .then(
         page.render('gwp.png')
     );
+
     await page.evaluate( function(){ $("#u_login_submit").click() } )
 
     const content = await page.property('content');
-    console.log(content)
 
     let cookies = await page.property('cookies')
      JsonOutput( cookies, 'byrLinshao.json' )
