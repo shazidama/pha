@@ -5,12 +5,12 @@
     "name": "Hm_lpvt_38b0e830a659ea9a05888b924f641842",
     "path": "/",
     "secure": false,
-    "value": "1500701479"
+    "value": "1501121620"
   },
   {
     "domain": ".bbs.byr.cn",
-    "expires": "周日, 22 7月 2018 05:31:18 GMT",
-    "expiry": 1532237478,
+    "expires": "周五, 27 7月 2018 02:13:39 GMT",
+    "expiry": 1532657619,
     "httponly": false,
     "name": "Hm_lvt_38b0e830a659ea9a05888b924f641842",
     "path": "/",
@@ -23,7 +23,7 @@
     "name": "nforum[UTMPNUM]",
     "path": "/",
     "secure": false,
-    "value": "3320"
+    "value": "2207"
   },
   {
     "domain": ".bbs.byr.cn",
@@ -31,7 +31,7 @@
     "name": "nforum[UTMPKEY]",
     "path": "/",
     "secure": false,
-    "value": "47081852"
+    "value": "16582772"
   },
   {
     "domain": ".bbs.byr.cn",
