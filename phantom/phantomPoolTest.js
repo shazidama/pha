@@ -1,58 +1,85 @@
-const phantom = require('phantom'),
-    http = require('http'),
-    createPhantomPool = require('phantom-pool')
+let test = require('blue-tape')
+let createPool = require('phantom-pool')
 
-const startServer = () => new Promise((resolve, reject) => {
-    const server = http.createServer((req, res) => {
-        res.end('test')
-    }).listen((err) => {
-        if (err) return reject(err)
-        resolve(server)
+const getState = ({ size, available, pending, max, min }) => {
+    const state = { size, available, pending, max, min }
+    return state
+}
+
+const inUse = ({ size, available }) => size - available
+
+let phantomPool
+test('create pool', async() => {
+    phantomPool = createPool()
+})
+
+test('create pool', async(t) => {
+    const instance = await phantomPool.acquire()
+    const page = await instance.createPage()
+    const viewportSize = await page.property('viewportSize')
+    t.deepEqual(viewportSize, { height: 300, width: 400 })
+    await phantomPool.release(instance)
+})
+
+test('create some pools', async(t) => {
+    const instances = await Promise.all([
+        phantomPool.acquire(),
+        phantomPool.acquire(),
+        phantomPool.acquire(),
+        phantomPool.acquire(),
+    ])
+    t.deepEqual(getState(phantomPool), {
+        available: 0,
+        pending: 0,
+        max: 10,
+        min: 2,
+        size: 4,
+    })
+    const [firstInstance, ...otherInstances] = instances
+    await phantomPool.release(firstInstance)
+    t.deepEqual(getState(phantomPool), {
+        available: 1,
+        pending: 0,
+        max: 10,
+        min: 2,
+        size: 4,
+    })
+    await Promise.all(otherInstances.map(instance => phantomPool.release(instance)))
+    t.deepEqual(getState(phantomPool), {
+        available: 4,
+        pending: 0,
+        max: 10,
+        min: 2,
+        size: 4,
     })
 })
 
-const pool = createPhantomPool({
-    max: 1
+test('use', async(t) => {
+    t.equal(inUse(phantomPool), 0)
+    console.log(inUse(phantomPool),123)
+    const result = await phantomPool.use(async(instance) => {
+        t.equal(inUse(phantomPool), 1)
+        const page = await instance.createPage()
+        return page.setting('javascriptEnabled')
+    })
+    t.equal(result, true)
+    t.equal(inUse(phantomPool), 0)
 })
 
-/* eslint-disable no-unused-vars */
-const noPool = async(url) => {
-    const instance = await phantom.create()
-    const page = await instance.createPage()
-    const status = await page.open(url, { operation: 'GET' })
-    if (status !== 'success') throw new Error(status)
-    const content = await page.property('content')
-        // console.log(content)
-    await instance.exit()
-}
-
-const withPool = (url) => pool.use(async(instance) => {
-    const page = await instance.createPage()
-    const status = await page.open(url, { operation: 'GET' })
-    if (status !== 'success') throw new Error(status)
-    const content = await page.property('content')
-    console.log(content)
+test('use and throw', async(t) => {
+    t.equal(inUse(phantomPool), 0)
+    try {
+        await phantomPool.use(async() => {
+            t.equal(inUse(phantomPool), 1)
+            throw new Error('some err')
+        })
+    } catch (err) {
+        t.equal(err.message, 'some err')
+    }
+    t.equal(inUse(phantomPool), 0)
 })
 
-const benchmark = async(iters) => {
-    const server = await startServer()
-    const url = `http://localhost:${server.address().port}`
-    console.log('Starting benchmark without pool')
-    for (let i = 0; i < iters; i++) {
-        console.time(`noPool-${i}`)
-        await noPool(`${url}/${i}`)
-        console.timeEnd(`noPool-${i}`)
-    }
-    console.log('')
-    console.log('Starting benchmark with pool')
-    for (let i = 0; i < iters; i++) {
-        console.time(`pool-${i}`)
-        await withPool(`${url}/${i}`)
-        console.timeEnd(`pool-${i}`)
-    }
-    console.log('Done')
-}
-
-benchmark(3).then(() => {
-    process.exit(0)
-}).catch(console.error)
+test('destroy pool', async() => {
+    await phantomPool.drain()
+    return phantomPool.clear()
+})
