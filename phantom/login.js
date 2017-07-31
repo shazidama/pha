@@ -22,7 +22,7 @@ async function pha() {
         //     (cookie) => {
         //         page.addCookie(cookie)
         //     }
-        // )
+        // ) 
     await page.on('onUrlChanged', (targetUrl) => {})
     await page.property('frameUrl').then((url) => {
         console.log(url)
@@ -57,6 +57,7 @@ async function pha() {
     JsonOutput(content, '/content/content.html')
     JsonOutput(urls, '/urls/byrUrls.json')
     console.log('sg')
+    await page.render('pic/sg.png')
     await page.render('pic/sg.png')
 
     await instance.exit();
