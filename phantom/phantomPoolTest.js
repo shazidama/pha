@@ -1,85 +1,33 @@
-let test = require('blue-tape')
-let createPool = require('phantom-pool')
-
-const getState = ({ size, available, pending, max, min }) => {
-    const state = { size, available, pending, max, min }
-    return state
-}
-
-const inUse = ({ size, available }) => size - available
+var test = require('blue-tape')
+var createPool = require('phantom-pool')
 
 let phantomPool
-test('create pool', async() => {
-    phantomPool = createPool()
+test('create pool with maxUses', async () => {
+  phantomPool = createPool({
+    maxUses: 3,
+    min: 1,
+    max: 2,
+  })
 })
 
-test('create pool', async(t) => {
-    const instance = await phantomPool.acquire()
-    const page = await instance.createPage()
-    const viewportSize = await page.property('viewportSize')
-    t.deepEqual(viewportSize, { height: 300, width: 400 })
-    await phantomPool.release(instance)
+test('instance is removed after 3 acquires', async (t) => {
+  const acquire1 = await phantomPool.acquire()
+  await phantomPool.release(acquire1)
+  const acquire2 = await phantomPool.acquire()
+  t.equal(acquire1, acquire2)
+  await phantomPool.release(acquire2)
+  const acquire3 = await phantomPool.acquire()
+  t.equal(acquire1, acquire3)
+  await phantomPool.release(acquire3)
+  const acquire4 = await phantomPool.acquire()
+  t.notEqual(acquire1, acquire4)
+  await phantomPool.release(acquire4)
+  const acquire5 = await phantomPool.acquire()
+  const acquire6 = await phantomPool.acquire()
+  console.log(phantomPool.pending,phantomPool.size, phantomPool.available, phantomPool.pending, phantomPool.max, phantomPool.min)
 })
 
-test('create some pools', async(t) => {
-    const instances = await Promise.all([
-        phantomPool.acquire(),
-        phantomPool.acquire(),
-        phantomPool.acquire(),
-        phantomPool.acquire(),
-    ])
-    t.deepEqual(getState(phantomPool), {
-        available: 0,
-        pending: 0,
-        max: 10,
-        min: 2,
-        size: 4,
-    })
-    const [firstInstance, ...otherInstances] = instances
-    await phantomPool.release(firstInstance)
-    t.deepEqual(getState(phantomPool), {
-        available: 1,
-        pending: 0,
-        max: 10,
-        min: 2,
-        size: 4,
-    })
-    await Promise.all(otherInstances.map(instance => phantomPool.release(instance)))
-    t.deepEqual(getState(phantomPool), {
-        available: 4,
-        pending: 0,
-        max: 10,
-        min: 2,
-        size: 4,
-    })
-})
-
-test('use', async(t) => {
-    t.equal(inUse(phantomPool), 0)
-    console.log(inUse(phantomPool),123)
-    const result = await phantomPool.use(async(instance) => {
-        t.equal(inUse(phantomPool), 1)
-        const page = await instance.createPage()
-        return page.setting('javascriptEnabled')
-    })
-    t.equal(result, true)
-    t.equal(inUse(phantomPool), 0)
-})
-
-test('use and throw', async(t) => {
-    t.equal(inUse(phantomPool), 0)
-    try {
-        await phantomPool.use(async() => {
-            t.equal(inUse(phantomPool), 1)
-            throw new Error('some err')
-        })
-    } catch (err) {
-        t.equal(err.message, 'some err')
-    }
-    t.equal(inUse(phantomPool), 0)
-})
-
-test('destroy pool', async() => {
-    await phantomPool.drain()
-    return phantomPool.clear()
+test('destroy pool', async () => {
+  await phantomPool.drain()
+  return phantomPool.clear()
 })
