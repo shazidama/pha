@@ -5,3 +5,5 @@ let pool = new createPool({
   min: 1,
   max: 2
 })
+console.log('sg')
+pool.destroy()
