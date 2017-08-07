@@ -1,5 +1,13 @@
 {
   "dependencies": {
+    "babel-eslint": "^7.2.3",
+    "babel-register": "^6.24.1",
     "phantomjs": "^2.1.7"
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "stage-0"
+    ]
   }
 }

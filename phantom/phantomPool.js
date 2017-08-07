@@ -1,28 +1,25 @@
 const phantom = require('phantom'),
   _ = require('lodash'),
-  createPhantomPool = require('phantom-pool'),
-  cookies = require('./cookie/byrLinshao.json'),
-  urls = require('./urls/byrUrls.json'),
-  recurce = require('./recures')
+  createPhantomPool = require('phantom-pool')
+  // ,cookies = require('./cookie/byrLinshao.json')
+  // ,urls = require('./urls/byrUrls.json')
+  // ,recurce = require('./recures')
 
-class Pool {
+class pool {
   constructor(poolData){
-
-    console.log(poolData)
-
     this.pool = createPhantomPool(poolData)
     this.instances = new Set()
   }
 
   async release (instance){
-    this.instances.delete(instance)
+    await this.instances.delete(instance)
     await this.pool.release(instance)
   }
 
   async arrAcquire (phantomArr){
     if(!Array.isArray(phantomArr))
       phantomArr = [phantomArr]
-    Promise.all(phantomArr.map(
+    await Promise.all(phantomArr.map(
       (pha)=>{
         this.instances.add(this.pool.acquire())
       })
@@ -60,21 +57,26 @@ class Pool {
   
   async use(fn){
     let resource = void 0
-    this.pool.acquire().then(function (r) {
+    await this.pool.acquire().then(function (r) {
       resource = r
+      this.instances.add(resource)
       return resource
-    }).then(fn,
+    }.bind(this)).then(fn.bind(this),
       function (err) {
-        this.pool.release(resource)
+        this.release(resource)
         throw err
-      })
-    this.instances.add(resource)
-    return resource
+      }.bind(this))
+    await this.release(resource)
+    return 'sg'
   } 
+  async test(){
+    console.log('sg')
+  }
   async destroy(){
+    let state = await this.getState(this.pool)
     await this.pool.drain()
     return this.pool.clear()
   }
 } 
 
-module.exports =  Pool
+module.exports =  pool

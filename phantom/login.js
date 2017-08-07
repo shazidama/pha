@@ -31,13 +31,13 @@ async function pha() {
 
 
 
-  await page.open(info.url + urls[0]).then(
+  let sgsg = await page.open(info.url + urls[0]).then(
     (status) => {
       console.log('status:', status)
       return status
     }
   )
-
+  console.log(sgsg)
   //此处可以作为交互部分
   if (!info.draw)
     await page.evaluate(function() {
@@ -60,7 +60,9 @@ async function pha() {
   await page.render('pic/sg.png')
   await page.render('pic/sg.png')
 
+
   await instance.exit()
+  return 'finished'
 }
 
-pha()
+let sg = pha()
