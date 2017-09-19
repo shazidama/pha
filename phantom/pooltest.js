@@ -3,6 +3,7 @@ const $ = require('jquery')
 const JsonOutput = require('./jsonOut')
 const recurse = require('./recurse')
 
+let ffxx = 0
 let pool = new createPool({
   maxUses: 3,
   min: 1,
@@ -20,6 +21,7 @@ let urls = ['/#default']
 let fn = async(instance)=>{
   await instance.createPage()
   const page = await instance.createPage()
+  await page.setting('loadImages',false).then(v=>{console.log(v)})
   let content = await page.property('content')
   await page.property('viewportSize', { width: 1920, height: 1080 })
   // await info.cookies.map(
@@ -27,12 +29,24 @@ let fn = async(instance)=>{
   //         page.addCookie(cookie)
   //     }
   // ) 
+  await page.on('onResourceRequested',()=>{
+    // ffxx++
+    // console.log('resourceRequested:',ffxx)
+  })
+  await page.on('onLoadFinished',async()=>{
+    let content = await page.property('content')
+    await page.render('pic/sg111.png')
+    // console.log(content,'loadFinished')
+  })
   await page.on('onUrlChanged', (targetUrl) => {__dirname})
   await page.property('frameUrl').then((url) => {
     console.log(url)
   })
-  await page.on('onResourceReceived', async(url) => {
-
+  await page.on('onResourceReceived', async(res) => {
+    if(res.stage=='start')
+      ffxx++
+    else ffxx--
+    // console.log('resourceReceived:',res.stage,ffxx,JSON.stringify(res,null,2))
   })
 
 
@@ -63,17 +77,12 @@ let fn = async(instance)=>{
 
   JsonOutput(urls, '/urls/byrUrls.json')
   console.log('sg')
-  content = await page.property('content')
-  console.log(content)
-  await page.render('pic/sg.png')
-  await page.render('pic/sg.png')
-  await page.render('pic/sg.png')
-  await page.render('pic/sg.png')
   await page.render('pic/sg.png')
   await page.render('pic/sg.png')
   // content = await page.property('content')
+  content = await page.property('content')
   JsonOutput(content, '/content/content.html')
-  console.log(content)
+  // console.logconsole.log(content)
 }
 let fn1 = (word)=>{console.log(word)}
 let sgsg = pool.use(fn)
