@@ -1,9 +1,6 @@
 const phantom = require('phantom'),
   _ = require('lodash'),
   createPhantomPool = require('phantom-pool')
-  // ,cookies = require('./cookie/byrLinshao.json')
-  // ,urls = require('./urls/byrUrls.json')
-  // ,recurce = require('./recures')
 
 class pool {
   constructor(poolData){
