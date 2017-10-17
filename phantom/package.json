@@ -2,6 +2,7 @@
   "dependencies": {
     "babel-eslint": "^7.2.3",
     "babel-register": "^6.24.1",
+    "mongodb": "^2.2.33",
     "phantom": "^4.0.5",
     "phantom-pool": "^1.2.2",
     "phantomjs": "^2.1.7"
